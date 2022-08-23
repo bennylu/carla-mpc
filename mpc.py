@@ -22,22 +22,18 @@ class MPC:
         # generate lane center locations
         self.speed_dt = speed_m_s * dt
 
-        x = 0
-        x_arr = []
-        for i in range(0, self.HORIZON):
-            x += self.speed_dt
-            x_arr.append(x)
+        x_arr = np.arange(1, self.HORIZON + 1) * self.speed_dt
         self.locs = np.vstack((x_arr, np.polyval(poly, x_arr))).T
 
         # mpc
         bounds = np.full((self.HORIZON, 2), (-0.3, 0.3))
         init_steer_arr = np.full(self.HORIZON, 0)
         solution = minimize(self.objective, init_steer_arr, (), method='SLSQP', bounds=bounds, tol=1e-4)
-        eval_states = np.array(self.evaluate_states(solution.x))[:, 0:2]
+        eval_states = self.evaluate_states(solution.x)
 
         # draw lines
         self.drawer.draw_camera_lines((255, 255, 255), utils.to_global_frame(self.ego, self.locs), 1)
-        self.drawer.draw_camera_lines((255, 0, 0), utils.to_global_frame(self.ego, eval_states), 1)
+        self.drawer.draw_camera_lines((255, 0, 0), utils.to_global_frame(self.ego, np.array(eval_states)[:, 0:2]), 1)
 
         return solution.x[0]
     
