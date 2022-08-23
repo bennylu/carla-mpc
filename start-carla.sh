@@ -1,0 +1,1 @@
+sudo docker run --privileged --gpus all --net=host --name carla --rm -e DISPLAY=$DISPLAY carlasim/carla:0.9.13 /bin/bash ./CarlaUE4.sh -quality-level=Epic -nosound -RenderOffScreen -benchmark -fps=20 -ResX=1024 -ResY=768 -world-port=2000 -d
