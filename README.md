@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ## Run
 ```
-./start_carla.sh
+./start-carla.sh
 
 # on another terminal
 python main.py
