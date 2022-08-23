@@ -5,7 +5,7 @@ from scipy.optimize import minimize
 
 class MPC:
 
-    HORIZON = 6
+    HORIZON = 10
     L = 2.5
 
     def __init__(self, drawer, ego):
@@ -28,23 +28,16 @@ class MPC:
             x += self.speed_dt
             x_arr.append(x)
         self.locs = np.vstack((x_arr, np.polyval(poly, x_arr))).T
-        self.drawer.draw_camera_lines((255, 255, 255), utils.to_global_frame(self.ego, self.locs), 1)
-
-        self.psi_arr = []
-        vec_0 = utils.r_loc_2_vec_3d([1, 0, 0])
-        for i in range(self.HORIZON - 1):
-            vec_1 = utils.r_loc_2_vec_3d(self.locs[i + 1]) - utils.r_loc_2_vec_3d(self.locs[i])
-            psi = np.deg2rad(utils.get_vector_degree(vec_0, vec_1))
-            if vec_1.y < 0:
-                psi = -psi
-            self.psi_arr.append(psi)
 
         # mpc
         bounds = np.full((self.HORIZON, 2), (-0.3, 0.3))
         init_steer_arr = np.full(self.HORIZON, 0)
         solution = minimize(self.objective, init_steer_arr, (), method='SLSQP', bounds=bounds, tol=1e-4)
         eval_states = np.array(self.evaluate_states(solution.x))[:, 0:2]
-        self.drawer.draw_camera_lines((0, 0, 255), utils.to_global_frame(self.ego, eval_states), 1)
+
+        # draw lines
+        self.drawer.draw_camera_lines((255, 255, 255), utils.to_global_frame(self.ego, self.locs), 1)
+        self.drawer.draw_camera_lines((255, 0, 0), utils.to_global_frame(self.ego, eval_states), 1)
 
         return solution.x[0]
     
@@ -70,16 +63,9 @@ class MPC:
     def objective(self, steer_arr, *args):
         states = self.evaluate_states(steer_arr)
 
-        cost_cte = 0
-        for i in range(self.HORIZON):
-            state = states[i]
-            loc = self.locs[i]
+        state = states[-1]
+        loc = self.locs[-1]
 
-            if i < self.HORIZON - 1:
-                psi = self.psi_arr[i]
-            else:
-                psi = 0
-
-            cost_cte += math.sqrt((state[0] - loc[0]) ** 2 + (state[1] - loc[1]) ** 2 + (state[2] - psi) ** 2)
+        cost_cte = math.sqrt((state[0] - loc[0]) ** 2 + (state[1] - loc[1]) ** 2)
 
         return cost_cte

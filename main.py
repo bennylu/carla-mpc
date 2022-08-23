@@ -43,8 +43,6 @@ class Main():
             wp = _wps[0]
             path.append(wp.transform.location)
 
-        # self.drawer.draw_camera_lines([0, 0, 0], path, 1)
-
         # get forward speed
         velocity = self.ego.get_velocity()
         speed_m_s = math.sqrt(velocity.x ** 2 + velocity.y ** 2 + velocity.z ** 2)
@@ -52,7 +50,7 @@ class Main():
 
         # generate control signal
         control = carla.VehicleControl()
-        control.throttle = 0.3
+        control.throttle = 0.6
         control.steer = self.mpc.run_step(path, speed_m_s, dt)
 
         # apply control signal
