@@ -2,7 +2,7 @@
 
 In this repo, a MPC based vehicle steering controller is implemented based on Carla simulator.
 
-![image](https://github.com/bennylu/carla-mpc/blob/master/screenshot.png)
+<img src="https://github.com/bennylu/carla-mpc/blob/master/screenshot.png" width="70%"></img>
 
 ## Setup
 ```
