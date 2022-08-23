@@ -57,11 +57,6 @@ class MPC:
         return states
 
     def objective(self, steer_arr, *args):
-        states = self.evaluate_states(steer_arr)
-
-        state = states[-1]
-        loc = self.locs[-1]
-
-        cost_cte = math.sqrt((state[0] - loc[0]) ** 2 + (state[1] - loc[1]) ** 2)
-
-        return cost_cte
+        final_state = self.evaluate_states(steer_arr)[-1]
+        final_loc = self.locs[-1]
+        return math.sqrt((final_state[0] - final_loc[0]) ** 2 + (final_state[1] - final_loc[1]) ** 2)
